@@ -1,18 +1,39 @@
 site_name: mcNOTE
 site_url: https://mydominan.org/mysite
+repo_url: https://github.com/MC115-UIT/mcnote
+repo_name: MC115-UIT/mcnote
 theme:
   name: material
+  font:
+    text: Roboto Mono
+  icon:
+    previous: fontawesome/solid/angle-left
+    next: fontawesome/solid/angle-right
+    repo: fontawesome/brands/git-alt
+  logo: assets/logo-nbg.png
+  favicon: assets/logo-nbg.png
   palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
     # Palette toggle for light mode
-    - scheme: default
+    - media: "(prefers-color-scheme: light)"
+      scheme: default 
+      primary: blue grey
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+
     # Palette toggle for dark mode
-    - scheme: slate
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary : black
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Switch to system preference
   features:
     - navigation.instant
     - navigation.instant.progress
@@ -22,16 +43,22 @@ theme:
     - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
+    - navigation.footer
   #  - toc.integrate
     - navigation.top
     - search.suggest
     - search.highlight
     - search.share
+    - header.autohide
 plugins:
     - search
     - tags:
         tags_file: tags.md
     - blog
+extra:
+  social:
+    - icon: fontawesome/brands/facebook
+      link: https://fb.com/tuilacuongg
 markdown_extensions:
     - pymdownx.highlight:
         anchor_linenums: true
@@ -50,4 +77,5 @@ nav:
   - Tags: tags.md
   - Blog:
     - blog/index.md
+copyright: Copyright &copy; 2024 - 2099 Minh Cuong
 
