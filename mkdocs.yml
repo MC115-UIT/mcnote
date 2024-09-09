@@ -50,6 +50,8 @@ theme:
     - search.highlight
     - search.share
     - header.autohide
+    - content.code.copy
+    - content.code.select
 plugins:
     - search
     - tags:
@@ -67,13 +69,26 @@ markdown_extensions:
     - pymdownx.inlinehilite
     - pymdownx.snippets
     - pymdownx.superfences
+    - attr_list
+    - md_in_html
 nav:
   - Home: index.md
   - Code Docs:
-    - .NET: coding/sample-NET.md
+    - .NET: 
+      - Daily note : coding/NET/daily-note.md
+      - Helper : coding/NET/helper.md
+      - Research : coding/NET/research.md
+      - Interview : coding/NET/interviewing.md
+      - Coding-pattern : coding/NET/pattern-approach.md
+    - Data engineer: 
+      - ETL :
+        - Sale-mart project : coding/DE/ETL/Sale-mart-sample.md
+      - Daily note : coding/DE/daily-note.md
+      - Helper : coding/DE/helper.md
   - About:
     - About me: about/about.md
     - Childhood: about/childhood.md
+    - Portfolito: about/portfolito.md
   - Tags: tags.md
   - Blog:
     - blog/index.md
