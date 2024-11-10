@@ -1,4 +1,4 @@
-site_name: mcNOTE
+site_name: Liam Nguyen
 site_url: https://mydominan.org/mysite
 repo_url: https://github.com/MC115-UIT/mcnote
 repo_name: MC115-UIT/mcnote
@@ -57,6 +57,7 @@ plugins:
     - tags:
         tags_file: tags.md
     - blog
+    - mkdocs-pdf
 extra:
   social:
     - icon: fontawesome/brands/facebook
@@ -73,6 +74,9 @@ markdown_extensions:
     - md_in_html
 nav:
   - Home: index.md
+  - About:
+    - About me: about/about.md
+    - Portfolito: about/portfolito.md
   - Code Docs:
     - .NET: 
       - Daily note : coding/NET/daily-note.md
@@ -85,10 +89,6 @@ nav:
         - Sale-mart project : coding/DE/ETL/Sale-mart-sample.md
       - Daily note : coding/DE/daily-note.md
       - Helper : coding/DE/helper.md
-  - About:
-    - About me: about/about.md
-    - Childhood: about/childhood.md
-    - Portfolito: about/portfolito.md
   - Tags: tags.md
   - Blog:
     - blog/index.md
