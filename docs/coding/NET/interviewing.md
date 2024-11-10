@@ -17,3 +17,4 @@
 ### Stack and heap in .NET 
 
 - [Overview stack and heap in .NET](https://medium.com/@kmorpex/understanding-memory-management-in-c-with-stack-and-heap-b79f14569433)
+- [ReanOnlySpan<T> and Pointer in stack](https://www.freedium.cfd/https://levelup.gitconnected.com/advanced-c-optimizations-which-boosted-our-applications-performance-10x-7b5067ca980f (Pointer in Stack ???) )

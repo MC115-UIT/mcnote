@@ -74,12 +74,10 @@ Async program
 https://medium.com/@grishibharadwaj/async-await-best-practices-in-c-bfe0245355ed
 https://medium.com/@kmorpex/10-useful-c-net-snippets-to-code-like-a-pro-cb196dbc86d4?source=author_recirc-----b79f14569433----3---------------------a8d4ee63_2d37_46f0_974b_dcf114cd4917-------
 
-Tips
-https://www.freedium.cfd/https://medium.com/@kmorpex/10-useful-c-net-snippets-to-code-like-a-pro-cb196dbc86d4 (kmorpex)
+- [Tips](https://www.freedium.cfd/https://medium.com/@kmorpex/10-useful-c-net-snippets-to-code-like-a-pro-cb196dbc86d4 (kmorpex))
 
-Course 
-https://mehmetozkaya.medium.com/net-backend-bootcamp-modular-monoliths-vsa-ddd-cqrs-and-outbox-b6332b272209
+ - [Udemy Course](https://mehmetozkaya.medium.com/net-backend-bootcamp-modular-monoliths-vsa-ddd-cqrs-and-outbox-b6332b272209)
 	
-Testing using Testcontainer
-https://medium.com/codenx/testcontainers-for-integration-testing-in-net-868df3b0fbc2
+- [Testing using Testcontainer](https://medium.com/codenx/testcontainers-for-integration-testing-in-net-868df3b0fbc2)
 
+ - [Building workflow engine in .NET](https://medium.com/@riffkikris13/workflow-engine-integration-with-net-core-9ab0ff1c4025)

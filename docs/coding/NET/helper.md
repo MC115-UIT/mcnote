@@ -137,3 +137,59 @@ app.UseHealthCheckUI(delegaate (Options options)
 	options.AddCustomStyleSheet("./HealthCheck/Custom.css");
 })
 ```
+
+## Expression builder
+
+```c# title="ExpressionBuilder.cs"
+public class ExpressionBuilder<T>
+{
+	// create expression entity => entity.propertyName
+	public Expression CreatePropertyExpression(
+		Expression entityParameter,
+		string propertyName, object? value
+	)
+	{
+		var property= typeof(T).GetProperty(propertyName);
+		var propertyAccess = Expression.MakeMemberAccess(entityParameter, property);
+		var valueExpression = Expression.Constant(value, property.PropertyType);
+		var equalsExpression = Expression.Equal(propertyAccess, valueExpression);
+
+		return equalsExpression;
+	}
+	// create expression entity => entity.propertyName1 == value1 && entity.propertyName2 == value2 && ...
+
+	public Func<T,bool> ComplexExpression(List<Tupple<string,object> conditions>)
+	{
+		Expression expression = null;
+		var parameter = Expression.Parameter(typeOf(T), "entity");
+		
+		foreach(var condition in conditions)
+		{
+			var currentExpression = CreatePropertyExpression(parameter, condition.Item1, condition.Item2);
+			if(expression == null)
+			{
+				expression = currentExpression;
+				continue;
+			}
+			expression = Expression.AndAlso(expression, currentExpression);
+		}
+		var lambda = Expression.Lambda<Func<T,bool>>(expression, parameter);
+		return lambda.Compile();
+	}
+}
+
+```
+
+Usage 
+```c#
+	var builder = new ExpressionBuilder<Foo>();
+
+	// this can be create it at runtime
+	var conditions = new List<Tupple<string,object>>{
+		new Tupple<string,object>("Condition1", "Value1"),
+		new Tupple<string,object>("Condition2", "Value2")
+		//etc
+	}
+	var expression = builder.ComplexExpression(conditions);
+	var filterd = list.Where(expression).Tolist()
+```
