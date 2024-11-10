@@ -62,6 +62,8 @@ extra:
   social:
     - icon: fontawesome/brands/facebook
       link: https://fb.com/tuilacuongg
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/minhcuong11005/
 markdown_extensions:
     - pymdownx.highlight:
         anchor_linenums: true
