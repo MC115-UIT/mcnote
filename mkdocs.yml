@@ -72,6 +72,7 @@ markdown_extensions:
     - pymdownx.inlinehilite
     - pymdownx.snippets
     - pymdownx.superfences
+    - pymdownx.blocks.caption
     - attr_list
     - md_in_html
 nav:
@@ -81,9 +82,10 @@ nav:
     - Portfolito: about/portfolito.md
   - Code Docs:
     - .NET: 
+      - Research :
+        - Prometheus and Grafana : coding/NET/Research/prothemeus.md
       - Daily note : coding/NET/daily-note.md
       - Helper : coding/NET/helper.md
-      - Research : coding/NET/research.md
       - Interview : coding/NET/interviewing.md
       - Coding-pattern : coding/NET/pattern-approach.md
     - Data engineer: 
