@@ -12,4 +12,4 @@ tags:
   <figcaption>From pinterest</figcaption>
 </figure>
 
-Tính chất cú pháp của thế giới thể hiện thực tại này, thế giới được hình thành qua ngôn ngữ, nếu biết được bí mật các ngôn từ, chữ viết có thể thể hiện thế giới, ta có thể thực hiện bất cứ thứ gì ta muốn, có thể hack nó như hack một hệ thống thông qua ngôn ngữ lập trình.
+Bản chất có tính cú pháp của thực tại, bí mật đích thực của phép màu, là thế giới được tạo ra bởi từ ngữ. Và nếu bạn biết được điều đó, bạn có thể tạo được bất cứ thứ gì bạn muốn. Nếu thế giới được tạo ra bởi ngôn ngữ, thì bạn có thể hack nó như bạn hack một đoạn mã lập trình.
