@@ -730,3 +730,363 @@ Let’s look at an example where we use reflection and attributes for method exe
 	}
 ```
 
+## 	Stream Transfer Service 
+
+1. Basic Stream pipeline approach
+```c#
+
+	public class StreamTransferService
+	{
+		private readonly HttpClient _httpClient;
+		private const int BufferSize = 81290; // 80KB buffer
+
+		public StreamTransferService(HttpClient httpclient)
+		{
+			this._httpClient = httpClient;
+		}
+
+		public async Task StreamTransferAsync(
+			string downloadUrl,
+			string uplaodUrl,
+			IProgress<doulbe> progress = null,
+			CancellationToken cancellationToken = default
+		)
+		{
+			using var downloadResponse = await _httpClient.GetAsync(
+				downloadUrl,
+				HttpCompletionOptions.ResponseHeadersRead,
+				cancellationToken
+			);
+
+			downloadResponse.EnsureSuccessStatusCode();
+			var totalLength = downloadResponse.Content.Headers.ContentLength ?? -1L;
+
+			using var downloadStream = await downloadResponse.Content.ReadAsStreamAsync(cancellationToken);
+			using var streamContent = new ProgressStreamContent(
+				downloadStream,
+				totalLength,
+				progress
+			);
+
+			using var uploadResponse = await _httpClient.PostAsync(
+				uploadUrl,
+				streamContent,
+				cancellationToken
+			);
+			uploadResponse.EnsureSuccessStatusCode();
+		}
+	}
+```
+
+2. Advanced Implementation with Chunked Processing
+
+```c#
+
+	public class ChunkStreamTransfer
+	{
+		private readonly HttpClient _httpClient;
+		private const int ChunkSize = 1024 * 1024; // 1MB chunk
+		private const int MaxBufferSize = 5 * 1024 * 1024; // 5MB max buffer
+
+
+		public ChunkStreamTransfer(HttpClient httpClient)
+		{
+			this._httpClient = httpClient;
+		}
+
+		public async Task StreamTransferWithChunkAsync(
+			string downloadUrl,
+			string uploadUrl,
+			IProgress<doulbe> progress = null,
+			CancellationToken cancellationToken = default
+		)
+		{
+			using var downlaodResponse = await _httpClient.GetAsync(
+				downloadUrl,
+				HttpCompletionOption.ResponseHeadersRead,
+				cancellationToken
+			);
+
+			downloadResponse.EnsureSuccessStatusCode();
+			var totalLength = downloadResponse.Content.Headers.ContentLength ?? -1L;
+
+
+			// Create chunked content
+			var chunkedContent = new ChunkedTransferContent(
+				downloadResponse.Content.ReadAsStreamAsync(cancellationToken),
+				totalLength,
+				ChunkSize,
+				MaxBufferSize,
+				progress);
+
+			using var uploadResponse = await _httpClient.PostAsync(
+				uploadUrl,
+				chunkedContent,
+				cancellationToken);
+				
+			uploadResponse.EnsureSuccessStatusCode();
+		}
+	}
+
+	public class ChunkedTransferConntent : HttpContent
+	{
+		private readonly Task<Stream> _sourceStreamTask;
+		private readonly long _totalLength;
+		private readonly int _chunkSize;
+		private readonly int _maxBufferSize;
+		private readonly IProgress<double> _progress;
+		private long _byteProcessed;
+
+
+		public ChunkedTransferContent(
+			Task<Stream> sourceStreamTask,
+			long totalLength,
+			int chunkSize,
+			int maxBufferSize,
+			IProgess<double> progress
+		)
+		{
+			_sourceStreamTask = sourceStreamTask;
+			_totalLength = totalLength;
+			_chunkSize = chunkSize;
+			_maxBufferSize = maxBufferSize;
+			_progress = progress;
+
+			// Set content header of needed
+			Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+		}
+
+		protected override async Task SerializeToStreamAsync(
+			Stream targetStream,
+			TransportContext context,
+			CancellationToken cancellationToken
+		)
+		{
+			using var sourceStream = await _sourceStreamTask;
+			var buffer = new byte[_chunkSize];
+			var semaphore = new SemaphoreSlim(_maxBufferSize / _chunkSize);
+
+			while(true)
+			{
+				await semaphore.WaitAsync(cancellationToken);
+
+				try
+				{
+					int bytesRead = sourceStream.ReadAsync(
+						buffer,
+						cancellationToken
+					);
+
+					if(bytesRead == 0) break;
+
+					await targetStream.WriteAsync(
+						buffer.AsMemory(0, bytesRead),
+						cancellationToken
+					);
+
+					_byteProcessed += bytesRead;
+					ReportProgress();
+
+				}
+				finally
+				{
+					semaphore.Release();
+				}
+			}
+		}
+		private void ReportProgress()
+		{
+			if (_totalLength > 0 && _progress != null)
+			{
+				var progressPercentage = (double)_bytesProcessed / _totalLength * 100;
+				_progress.Report(progressPercentage);
+			}
+		}
+		protected override bool TryComputeLength(out long length)
+		{
+			length = _totalLength;
+			return _totalLength > 0;
+		}
+	}
+
+```
+
+3.Implementation with Back-pressure Support:
+
+```c#
+
+	public class BackPressureStreamTransfer
+	{
+		private readonly HttpClient _httpClient;
+		private readonly Channel<Memory<byte>> _channel;
+		private const int MaxBufferSize = 5;
+
+
+		public BackPressureStreamTransfer(
+			string downloadUrl,
+			string uploadUrl,
+			IProgress<double> progress = null,
+			CancellationToken cancellationToken = defautl
+		)
+		{
+			using var downloadResponse = _httpClient.GetAsync(
+				downloadUrl,
+				HttpCompletionOption.ResponseHeadersRead,
+				cancellationToken
+			);
+
+			downdloadResponse.EnsureSuccesStatusCode();
+			var totalLength = downloadResponse.Headers.ContentLength ?? -1L;
+
+			// Start producer and consumer tasks
+
+			var downloadTask = DownloadDataAsync(
+				downloadResponse,
+				progress,
+				cancellationToken
+			);
+
+			var uploadTask = UploadDataAsync(
+				uploadUrl,
+				totalLength,
+				progress,
+				cancellationToken
+			);
+
+			// wait for all tasks to complete
+			await Task.WhenAll(downloadTask, uploadTask);
+		}
+
+		private async Task DownloadDataAsync(
+			HttpResponseMessage response,
+			IProgress<double> progress,
+			CancellationToken cancellationToken
+		)
+		{
+			try
+			{
+				using var sourceStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+				var buffer = new byte[81290] // 80KB chunks
+
+				while(true)
+				{
+					var bytesRead = await sourceStream.ReadAsync(
+						buffer,
+						cancellationToken
+					);
+
+					if(bytesRead == 0) break;
+
+					var chunk = new byte[bytesRead];
+					Array.Copy(buffer, chunk, bytesRead);
+
+					await _channel.WriteAsync(chunk, cancellationToken);
+				}
+			}
+			finally
+			{
+				_channel.Writer.Complete();
+			}
+		}
+
+		private async Task UploadDataAsync(
+			string uploadUrl,
+			long totalLength,
+			IProgess<double> progess,
+			CancellationToken cancellationToken
+		)
+		{
+			using var content = new PipContent(
+				_channel.Reader,
+				totalLength,
+				progress
+			);
+
+
+			using var response = await _httpClient.PostAsync(
+				uploadUrl,
+				content,
+				cancellationToken
+			);
+
+			response.EnsureSuccessStatusCode();
+		}
+
+		private class PipeContent : HttpContent
+		{
+			private readonly ChannelRead<Memory<byte>> _reader;
+			private readonly long _totalLength;
+			private readonly IProgress<double> _progress;
+			private long _byteProcessed;
+
+			public PipeContent(
+				ChannelReader<Memory<byte>> reader,
+				long totalLength,
+				IProgress<double> progress)
+			{
+				_reader = reader;
+				_totalLength = totalLength;
+				_progress = progress;
+				_bytesProcessed = 0;
+			}
+
+			protected override async Task SerializeToStreamAsync(
+				Stream targetStream,
+				TransportContext context,
+				CancellationToken cancellationToken
+			)
+			{
+				await foreach ( var chunk in _reader.ReadAllAsync(cancellationToken))
+				{
+					await targetStream.WriteAsync(
+						chunk,
+						cancellationToken
+					);
+
+					ReportProgess();
+				}
+			}
+			private void ReportProgress()
+			{
+				if (_totalLength > 0 && _progress != null)
+				{
+					var progressPercentage = (double)_bytesProcessed / _totalLength * 100;
+					_progress.Report(progressPercentage);
+				}
+			}
+
+			protected override bool TryComputeLength(out long length)
+			{
+				length = _totalLength;
+				return _totalLength > 0;
+			}
+		}
+	}
+	
+	/// Usage Example 
+
+	async Task Example
+	{
+		using var httpClient = new HttpClient(configuration);
+		var transfer = new BackPressureStreamTransfer(httpClient);
+
+		var progress = new Progress<double>(percentage =>
+		{
+			await CommonService.LogService.LogInformation($"Transfer progess : {percentage:F2}%");
+		});
+
+		try
+		{
+			await transfer.StreamTransferWithBackPressureAsync(
+				_downloadUrl,
+				_uploadUrl,
+				progress
+			);
+		}
+		catch (Exception ex)
+		{
+			await CommonService.LogService.LogError($"Transfer failed : {ex.Message}");
+		}
+	}
+```
