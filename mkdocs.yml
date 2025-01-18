@@ -89,6 +89,7 @@ nav:
       - Helper : coding/NET/helper.md
       - Interview : coding/NET/interviewing.md
       - Coding-pattern : coding/NET/pattern-approach.md
+      - Bug-review : coding/NET/coding-bug.md
     - Data engineer: 
       - ETL :
         - Sale-mart project : coding/DE/ETL/Sale-mart-sample.md
