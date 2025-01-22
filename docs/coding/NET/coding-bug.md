@@ -49,5 +49,4 @@ If need to run this functio asynchronously, this is once suitable approach:
         {
             return CreateResponse(false, "Failed to create the connection using this configuration");
         }
-
 ```

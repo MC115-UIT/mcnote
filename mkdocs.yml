@@ -5,7 +5,10 @@ repo_name: MC115-UIT/mcnote
 theme:
   name: material
   font:
-    text: Roboto Mono
+    text: Lora
+#  font: false
+#  extra_css:
+#    - docs/stylesheets/extra.css
   icon:
     previous: fontawesome/solid/angle-left
     next: fontawesome/solid/angle-right

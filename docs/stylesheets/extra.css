@@ -1,0 +1,8 @@
+@font-face {
+    font-family: "Lora";
+    src: url("/docs/assets/fonts/Lora-Regular.ttf") format('truetype');
+}
+
+:root {
+    --md-text-font: "Lora";
+}
