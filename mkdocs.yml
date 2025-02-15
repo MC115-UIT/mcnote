@@ -88,6 +88,7 @@ nav:
       - Research :
         - Prometheus and Grafana : coding/NET/Research/prothemeus.md
         - Advanced Dependency Injection Patterns and Service Lifetime Management in .NET : coding/NET/Research/advanced-dependency-injection.md
+        - Must-know C#13 and .NET 9 Features : coding/NET/Research/net9.md
       - Daily note : coding/NET/daily-note.md
       - Helper : coding/NET/helper.md
       - Interview : coding/NET/interviewing.md

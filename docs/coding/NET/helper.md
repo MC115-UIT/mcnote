@@ -1090,3 +1090,28 @@ Let’s look at an example where we use reflection and attributes for method exe
 		}
 	}
 ```
+## Complied Quries for commonly repeated queries
+
+Ef Core supports the compiled queries for frequently executed queries
+
+```c#
+	private static readonly Func<AppDbContext, bool, Task<List<T>>> _getEntitiesByStatus<T> Where T : class, IActivatable = EF.CompileAsyncQuery((AppDbContext context, bool isActive) => 
+		context.Set<T>().Where(e => e.IsActive == isActive).ToListAsync()
+	);
+
+	public interface IActivatable
+	{
+		bool IsActive {get; set;}
+	}
+
+	// Example entity
+	public class User : IActivatable
+	{
+		public int Id {get; set;}
+		public string Name {get; set;}
+		public bool isActive {get; set}
+	}
+
+	// Example Usage
+	var activeUsers = await _getEntitiesByStatus<User>(_contextDb, true);
+```

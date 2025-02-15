@@ -194,3 +194,112 @@ computer.Add(new SingleComponent("GPU", 500));
 computer.Display(0); 
 Console.WriteLine("Total Price: $" + computer.GetPrice());
 ```
+
+### 5. Chain of responsibility
+
+EXAMPLE : Approving leave request
+
+```c#
+
+	public class LeaveRequest
+	{
+		public string EmployeeName {get; set;}
+		public int NumberOfDays {get; set;}
+		public string Reason {get; set;}
+	}
+
+
+	public abstract class LeaveHandler
+	{
+		protected LeaveHandler NextHandler;
+
+		public void SetNextHandler(LeaveHandler nextHandler)
+		{
+			NextHandler = nexthandler;
+		}
+
+		public void HandleRequest(LeaveRequest leaveRequest)
+		{
+			if(CanHandle(leaveRequest.NumberOfDays))
+			{
+				ProcessRequest(leaveRequest);
+			}
+			else if(NextHanlder != null)
+			{
+				NextHandler.HandleRequest(leaveRequest);
+			}
+			else
+			{
+				Console.WriteLine("Leave request could not be processed.");
+			}
+		}
+
+		protected abstract bool CanHandle(int numberOfDays);
+		protected abstract void ProcessRequest(LeaveRequest request);
+
+	}
+
+	public class TeamLead : LeaveHandler
+	{
+		protected override bool CanHandle(int numberOfDays) => numberOfDays <= 3;
+
+		protected override void ProcessRequest(LeaveRequest request)
+		{
+			Console.WriteLine($"Leave request by {request.EmployeeName} for {request.NumberOfDays} days approved by Team Lead.");
+		}
+	}
+
+	public class ProjectManager : LeaveHandler
+	{
+		protected override bool CanHandle(int numberOfDays) => numberOfDays <= 5;
+
+		protected override void ProcessRequest(LeaveRequest request)
+		{
+			Console.WriteLine($"Leave request by {request.EmployeeName} for {request.NumberOfDays} days approved by Project Manager.");
+		}
+	}
+
+	public class HRManager : LeaveHandler
+	{
+		protected override bool CanHandle(int numberOfDays) => numberOfDays > 5;
+
+		protected override void ProcessRequest(LeaveRequest request)
+		{
+			Console.WriteLine($"Leave request by {request.EmployeeName} for {request.NumberOfDays} days approved by HR Manager.");
+		}
+	}
+
+	// Usage
+	using Chainofresponbility;
+
+	// Create handlers
+	var teamLead = new TeamLead();
+	var projectManager = new ProjectManager();
+	var hrManager = new HRManager();
+
+	// Set up the chain
+	teamLead.SetNextHandler(projectManager);
+	projectManager.SetNextHandler(hrManager);
+
+	// Create a leave request
+	var leaveRequest = new LeaveRequest
+	{
+		EmployeeName = "Devesh",
+		NumberOfDays = 4,
+		Reason = "Sick Leave"
+	};
+
+	// Process the request
+	teamLead.HandleRequest(leaveRequest);
+
+	// Another leave request
+	var anotherLeaveRequest = new LeaveRequest
+	{
+		EmployeeName = "Sanjay Singh",
+		NumberOfDays = 6,
+		Reason = "Vacation"
+	};
+
+	// Process the request
+	teamLead.HandleRequest(anotherLeaveRequest);
+```
