@@ -1115,3 +1115,449 @@ Ef Core supports the compiled queries for frequently executed queries
 	// Example Usage
 	var activeUsers = await _getEntitiesByStatus<User>(_contextDb, true);
 ```
+
+## Polymorphism with `AddKeyedSingleton`, considered replacement of switch statement
+
+```c#
+	public interface IPaymentProcessor
+	{
+		void ProcessPayment();
+	}
+
+	public class CreditCardPaymentProcessor : IPaymentProcessor
+	{
+		public void ProcessPayment()
+		{
+			// Handle credit card payment
+		}
+	}
+
+	public class PayPalPaymentProcessor : IPaymentProcessor
+	{
+		public void ProcessPayment()
+		{
+			// Handle PayPal payment
+		}
+	}
+
+	public class BitcoinPaymentProcessor : IPaymentProcessor
+	{
+		public void ProcessPayment()
+		{
+			// Handle Bitcoin payment
+		}
+	}
+
+	// registration of service
+
+	builder.services.AddKeyedSingleton<IPaymentProcessor,CreditCardPaymentProcessor>(PaymentType.CrediCard);
+	builder.services.AddKeyedSingleton<IPaymentProcessor,PayPalPaymentProcessor>(PaymentType.PayPa;);
+	builder.services.AddKeyedSingleton<IPaymentProcessor,BitcoinPaymentProcessor>(PaymentType.Bitcoin);
+
+	// then resolve it dynamically
+
+	public class PaymentService
+	{
+		private readonly IServiceProvider _seviceProvider;
+
+		public PaymentService(IServiceProvider serviceProvider)
+		{
+			this._serviceProvider = serviceProvider;
+		}
+
+		public void ProcessPayment(PaymentType paymentType)
+		{
+			var paymentProcessor = _serviceProvider.GetRequiredKeyedService<IPaymentProcessor>(paymentType);
+			paymentProcessor?.ProcessPayment() ?? throw new InvalidOperationException($"No payment type such as {paymentType}");
+		}
+	}
+```
+
+## Cursor pagination
+
+Example with `Date` and `Id` field to create a cursor for our `UserNotes` table. The cursor is a
+composite of these two fields, allowing us to paginate effciently.
+
+```c#
+
+	app.MapGet("/cursor", async (
+		AppDbContext dbContext,
+		DateOnly? date = null,
+		Guid? lastId = null,
+		int limit = 10,
+		CancellationToken cancellationToken = default
+	) => {
+		
+		if(limit < 1 ) return Results.BadRequest("Limit must be greater than 0");
+		if(limit > 100) return Result.BadRequest("Limit must be less than or equal 100");
+
+		var query = dbContext.UserNotes.AsQueryable();
+
+		if(date != null && lastId != null)
+		{
+			query = query.Where(x => x.Date < date || (x.Date == date && x.Id <= lastId));
+		}
+
+
+		var items = await query
+			.OrderByDescending(x => x.Date)
+			.ThenByDescending(x => x.Id)
+			.Take(limit + 1)
+			.ToListAsync(cancellationToken)
+
+		bool hasMore = item.Count > limit;
+		DateOnly? nextDate = hasMore ? items[^1].Date : null;
+		Guid? nextId = hasMore ? item[^1].Id : null;
+
+		items.RemoveAt(items.Count - 1);
+
+		return Result.Ok(new {
+			Items = items,
+			NextDate = nextDate,
+			NextLastId = nextLastId,
+			HasMore = hasMore
+		});
+	});
+```
+**Encoding the Cursor**
+
+Here's a small utility class for encoding and decoding the cursor. We'll use this to encode the cursor in the URL and decode it when fetching the next set or results.
+
+The clients will receive the cursor as a Base64-encoded string. They don't need to know the internal structure of the cursor
+
+```c#
+	using Microsoft.AspNetCore.Authentication;
+
+	public sealed record Cursor(DateOnly Date, Guid LastId)
+	{
+		public static string Encode(DateOnly date, Guid lastId)
+		{
+			var cursor = new Cursor(date, lastId);
+			string json = JsonSerializer.Serialize(cursor);
+			return Base64UrlTextEncoder.Encode(Encoding.UTF8.GetBytes(json));
+		}
+
+		public static string Cursor? Decode(string? cursor)
+		{
+			if(string.IsNullOrEmpty(cursor)) return null;
+
+			try
+			{
+				string json = Encoding.UTF8.GetString(Base64UrlTextEncoder.Decode(cursor));
+				return JsonSerializer.Deserialize<Cursor>(json);
+			}
+			catch
+			{
+				return null;
+			}
+
+		}
+	}
+
+
+	// Usage
+	string encodedCursor = Cursor.Encode(
+	new DateOnly(2025, 2, 15),
+	Guid.Parse("019500f9-8b41-74cf-ab12-25a48d4d4ab4"));
+	// Result:
+	// eyJEYXRlIjoiMjAyNS0wMi0xNSIsIkxhc3RJZCI6IjAxOTUwMGY5LThiNDEtNzRjZi1hYjEyLTI1YTQ4ZDRkNGFiNCJ9
+
+	Cursor decodedCursor = Cursor.Decode(encodedCursor);
+	// Result:
+	// {
+	//     "Date": "2025-02-15",
+	//     "LastId": "019500f9-8b41-74cf-ab12-25a48d4d4ab4"
+	// }
+```
+
+## Sample class for customize the exception handler
+
+```c#
+
+	using Microsoft.AspNetCore.Diagnostics;
+	using Microsoft.AspNetCore.Mvc;
+
+
+	namespace CleanArchitecture.Web.Infrastructure;
+
+	public class CustomExceptionHandler : IExceptionHandler
+	{
+		private readonly Dictionary<Type, Func<HttpContext, Exception, Task>> _exceptionHanlder;
+
+		public CustomExceptionHandler()
+		{
+			this._exceptionHandler = new ()
+			{
+				{typeof(ValidationException), HandlerValidationException},
+				{typeof(NotFoundException), HandlerNotFoundException},
+				{typeof(UnAuthorizedException, HandlerUnAuthorizedException)},
+				{typeof(ForbiddenAccessException), HandlerForbiddenAccessException},
+			};
+		}
+
+		public async ValueTask<bool> TryHandlerAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
+		{
+			var exceptionType = exception.GetType();
+			if(_exceptionHandler.ContainsKey(exceptionType))
+			{
+				await _exceptionHandler[exceptionType].Invoke(httpContext, exception);
+				return true;
+			}
+			return false;
+		}
+
+		private async Task HandlerValidationException(HttpContext httpContext, Exception ex)
+		{
+			var exception = (ValidationException)ex;
+
+			httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+			await httpContext.Response.WriteAsync(new ValidationProblemDetails(exception.Error)
+			{
+				Status = StatusCodes.Status400BadRequest,
+				Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+			});
+		}
+	    // likely implementing for other exception handler
+
+		private async Task HandlerNotFoundException(HttpContext httpContext, Exception ex)
+		{
+			var exception = (NotFoundExceptio)ex;
+
+			httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+			await httpContext.Response.WriteAsync(new NotFoundException(exception.Error)
+			{
+				Status = StatusCodes.Status400BadRequest,
+				Type = "linkforreferdocument"
+			});
+		}
+	}
+```
+
+## Serialization and Deserialization with protobuf and automatically generating proto file
+
+- To starting using protobuf in .NET projects, we need to install the `protobuf-net` Nuget package. This package provides support for defining Protobuf schemas using C# attributes and generating `.proto` files from our C# class.
+
+- Define data models
+
+```c#
+	
+	[ProtoContract]
+	public class Person
+	{
+		[ProtoMember(1)]
+		public int Id {get; set;}
+
+		[ProtoMember(2)]
+		public string Name {get; set;}
+
+		[ProtoMember(3)]
+		public string Email {get; set;}
+	}
+```
+- Example class for ser/deserialize
+
+```c#
+
+	using Protobuf;
+	using System.IO;
+
+	public static class ProtoHelpers
+	{
+		public static byte[] Serialize<T>(T source)
+		{
+			using var stream = new MemoryStream();
+			Serializer.Serialize(stream, source);
+			return stream.ToArray();
+		}
+
+		public static T DeSerialize<T>(byte[] source)
+		{
+			using var stream = new MemoryStream(source);
+			return Serializer.Deserialize<T>(stream);
+ 		}
+	}
+```
+
+- Usage
+
+```c#
+
+	using System;
+
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+			Person person = new Person
+			{
+				Id = 123,
+				Name = "John Doe",
+				Email = "john.doe@example.com"
+			};
+
+			// Serialize the person to a byte array
+			byte[] serializedPerson = ProtoHelpers.Serialize(person);
+
+			// Deserialize the byte array back into a Person object
+			Person deserializedPerson = ProtoHelpers.Deserialize<Person>(serializedPerson);
+
+			Console.WriteLine($"ID: {deserializedPerson.Id}");
+			Console.WriteLine($"Name: {deserializedPerson.Name}");
+			Console.WriteLine($"Email: {deserializedPerson.Email}");
+		}
+	}
+```
+
+- Generating .proto Files
+
+```c#
+	using ProtoBuf.Meta;
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
+	using System.Text;
+
+	public static class ProtoUtils
+	{
+		public static string GenerateProto(IEnumerable<Type> protoTypes, string packageName)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.AppendLine("syntax = \"proto2\";");
+			sb.AppendLine("");
+			sb.AppendLine($"package {packageName};");
+			sb.AppendLine("option optimize_for = LITE_RUNTIME;");
+			sb.AppendLine("option cc_enable_arenas = true;");
+			sb.AppendLine("");
+
+			var getProto = typeof(RuntimeTypeModel).GetMethod("GetSchema", new[] {typeof(Type)});
+
+			Dictionary<string, string> allProto = new Dictionary<string, string>();
+			List<string> removeNames = new List<string>{"\r", "package"};
+
+			foreach(var type in protoTypes)
+			{
+				string result = (string)getProto.Invoke(RuntimeTypeModel.Default, new object[]{type});
+				List<string> splitMsg = result.Split(new[] {"message"}, StringSplitOptions.None).ToList();
+
+				foreach(string s in splitMsg)
+				{
+					List<string> splitEnum = s.Split(new[] {"enum"}, StringSplitOptions.None).ToList();
+
+					string sMsg = splitEnum[0];
+					string sMsgName = sMsg.Split(new[] {"{"}, StringSplitOptions.None)[0];
+					if(removeNames.All(n => !sMsg.StartWith(n)))
+					{
+						allProto[sMsgName] = "message" + sMsg;
+					}
+
+					removeNames.Add(sMsgName);
+					if(splitEnum.Count > 0)
+					{
+						for(int i = 0; i < splitEnum.Count; i++)
+						{
+							string sEnum = splitEnum[i];
+							string sEnumName = sEnum.Split(new[] {"{"}, StringSplitOptions.None)[0];
+							if(removeNames.All(n => !sEnum.StartWith(n)))
+							{
+								allProto[sEnumName] = "enum" + sEnum;
+							}
+							removeNames.Add(sEnumName);
+						}
+					}
+				}
+			}
+		}
+		string proto = string.Join("", allProto.OrderBy(a => a.Key).Select(a => a.Value));
+
+        sb.Append(proto);
+        string protoContent = sb.ToString();
+
+        GenerateProtoFile(packageName, protoContent);
+        return protoContent;
+	}
+
+	public static void GenerateProtoFile(string protoFileName, string protoContent)
+    {
+        if (string.IsNullOrWhiteSpace(protoFileName)) return;
+
+        if (!protoFileName.EndsWith(".proto"))
+        {
+            protoFileName += ".proto";
+        }
+
+        string filePath = Path.Combine(AppContext.BaseDirectory, protoFileName);
+
+        // Overwrite if already exists
+        File.WriteAllText(filePath, protoContent);
+    }
+
+	// Usage 
+	public static string GeneratePersonProto()
+	{
+		string packageName = "PersonProto";
+
+		List<Type> protoTypes = new List<Type>
+		{
+			typeof(Person)
+		};
+
+		return ProtoUtils.GenerateProto(protoTypes, packageName);
+	}
+	
+	// This will generate a `person.proto` file that can be used for interproperability with other systems and languages.2w2
+```
+
+##  Expression-based approach - dynamic linq
+
+```c#
+	public class ExpressionBuilder
+	{
+		public static Expression<Func<T,bool>> BuilderBuildPredicate<T>(string propertyName, string comparision,
+		object value)
+		{
+			var parameter = Expression.Parameter(typeof(T), "x");
+			var property = Expression.Property(parameter, propertyName);
+			var constant = Expreesion.Constant(value);
+
+			Expression condition;
+			switch(comparision.ToLower())
+			{
+				case "equals":
+					condition = Expression.Equal(property, constant);
+					break;
+				case "contains":
+					var method = typeof(string).GetMethod("Contains", new[] {typeof(string)});
+					condition = Expression.Call(property, method, constant);
+					break;
+				case "greaterthan":
+					condition = Expression.GreaterThan(property, constant);
+					break;
+				case "lessthan":
+					condition = Expression.LessThan(property, constant);
+					break;
+				default:
+					throw new ArgumentException("Invalid comparision operator");
+			}
+			
+			return Expression.Lamda<Func<T,bool>>(condition, parameter);
+		}
+	}
+
+
+	// Usage
+
+	public IQueryable<Product> GetFilteredProductsWithExpressions(Dictionary<string, object> filters)
+	{
+		var query = _dbContext.Products.AsQueryable();
+		foreach(var filter in filters)
+		{
+			var predicate = ExpressionBuilder.BuildPredicate<Product>(filter.Key, "equals", filter.Value);
+			query = query.Where(predicate);
+		}
+
+		return query;
+	}
+```
