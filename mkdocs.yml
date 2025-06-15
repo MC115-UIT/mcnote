@@ -95,7 +95,6 @@ nav:
       - Interview : coding/NET/interviewing.md
       - Coding-pattern : coding/NET/pattern-approach.md
       - Bug-review : coding/NET/coding-bug.md
-    - Rust:
     - Data engineer: 
       - ETL :
         - Sale-mart project : coding/DE/ETL/Sale-mart-sample.md
