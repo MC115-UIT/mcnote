@@ -1561,3 +1561,394 @@ The clients will receive the cursor as a Base64-encoded string. They don't need 
 		return query;
 	}
 ```
+## HandFire on background-job
+
+### Helper functions
+```c#
+
+namespace HandFire
+{
+	#region Main HandFireHelper
+
+	public static class HandFireHelper
+	{
+		private static readonly IHandFireClient _handFireClient;
+
+		public static HandFireHelper()
+		{
+			_handFireClient = new HandFireClient();
+		}
+
+
+		#region Fire-and-Forget Jobs
+
+		public static string Enqueue<T>(Expression<Action<T>> methodCall, RetryOptions)
+		{
+			retryOptions ?? = DefaultRetryOptions;
+
+			return ExecuteWithRetry(() => 
+			{
+				var jobId = _handFireClient.Enqueue(methodCall);
+				_handFireClient.SetJobParamters(jobId, "RetryOptions", retryOptions);
+				return jobId;
+			}, "Enqueue");
+		}
+
+		public static string EnqueueAsync<T>(Expression<Func<T, Task>> methodCall, RetryOptions retryOptions = null)
+        {
+            retryOptions ??= DefaultRetryOptions;
+
+            return ExecuteWithRetry(() =>
+            {
+                var jobId = _handFireClient.Enqueue(methodCall);
+                _handFireClient.SetJobParameter(jobId, "RetryOptions", retryOptions);
+                return jobId;
+            }, "EnqueueAsync");
+        }
+
+		#endregion
+
+		#region Delayed Jobs
+
+		public static string Schedule<T>(Expression<Action<T>> methodCall, TimeSpan delay, RetryOptions retryOptions = null)
+		{
+			retryOptions ??= DefaultRetryOptions;
+
+            return ExecuteWithRetry(() =>
+            {
+                var jobId = _handFireClient.Schedule(methodCall, delay);
+                _handFireClient.SetJobParameter(jobId, "RetryOptions", retryOptions);
+                return jobId;
+            }, "Schedule");
+		}
+
+		 public static string ScheduleAt<T>(Expression<Action<T>> methodCall, DateTimeOffset enqueueAt, RetryOptions retryOptions = null)
+        {
+            retryOptions ??= DefaultRetryOptions;
+
+            return ExecuteWithRetry(() =>
+            {
+                var jobId = _handFireClient.Schedule(methodCall, enqueueAt);
+                _handFireClient.SetJobParameter(jobId, "RetryOptions", retryOptions);
+                return jobId;
+            }, "ScheduleAt");
+        }
+
+		#endregion
+
+		#region Recurring Jobs
+
+		public static void AddOrUpdateRecurring<T>(
+			string recurringJobId,
+			Expression<Action<T>> methodCall,
+			string cronExpression,
+			RecurringJobOptions options = null
+		)
+		{
+			var manager = new RecurringJobManager();
+
+			manager.AddOrUpdate(recurringJobId, methodCall, cronExpression, options ?? new RecurringOptions());
+		}
+
+		public static void AddOrUpdateRecurringAsync<T>(
+			string recurringJobId,
+			Expression<Func<T, Task>> methodCall,
+			string cronExpression,
+			RecurringOptions options = null
+		)
+		{
+			var manager = new RecurringJobManager();
+			manager.AddOrUpdate(recurringJobId, methodCall, cronExpression, options ?? new RecurringOptions());
+		}
+
+		public static void RemoveRecurring(string recurringJobId)
+        {
+            var manager = new RecurringJobManager();
+            manager.RemoveIfExists(recurringJobId);
+        }
+
+		#endregion
+
+		public static string ContinueWith<T>(
+            string parentJobId, 
+            Expression<Action<T>> methodCall, 
+            RetryOptions retryOptions = null)
+        {
+            retryOptions ??= DefaultRetryOptions;
+
+            return ExecuteWithRetry(() =>
+            {
+                var jobId = _handFireClient.ContinueJobWith(parentJobId, methodCall);
+                _handFireClient.SetJobParameter(jobId, "RetryOptions", retryOptions);
+                return jobId;
+            }, "ContinueWith");
+        }
+
+        public static string ContinueWithOnState<T>(
+            string parentJobId, 
+            Expression<Action<T>> methodCall, 
+            JobContinuationOptions options,
+            RetryOptions retryOptions = null)
+        {
+            retryOptions ??= DefaultRetryOptions;
+
+            return ExecuteWithRetry(() =>
+            {
+                var jobId = _handFireClient.ContinueJobWith(parentJobId, methodCall, options);
+                _handFireClient.SetJobParameter(jobId, "RetryOptions", retryOptions);
+                return jobId;
+            }, "ContinueWithOnState");
+        }
+
+        #endregion
+
+		#region Error Handling & Retry Configuration
+
+		public class ReTryOptions
+		{
+			public int MaxRetries {get; set;} = 3;
+			public TimeSpan InitialRetryInterval {get; set;} = TimeSpan.FromSeconds(30);
+			public TimeSpan MaxRetryInterval {get; set;} = TimeSpan.FromHours(1);
+			public bool UseExponentialBackoff {get; set;} = true;
+			public Type[] RetryableExceptions {get; set;} = new[] {typeof(Exception)};
+			public Action<Exception, int, TimeSpan> OnReTry {get; set;}
+
+			private static RetryOptions DefaultRetryOptions = new RetryOptions();
+
+			public static void ConfigureDefaultRetryOptions(Action<RetryOptions> configure)
+        	{
+            configure(DefaultRetryOptions);
+        	}
+		}
+		
+		#endregion
+
+		#region Job Recovery and Monitoring
+
+        public static class JobRecovery
+        {
+            public static async Task RecoverFailedJobs(
+                TimeSpan failedJobAge,
+                int batchSize = 100,
+                CancellationToken cancellationToken = default)
+            {
+                var failedJobs = await _handFireClient.GetFailedJobs(failedJobAge, batchSize);
+                
+                foreach (var job in failedJobs)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
+
+                    try
+                    {
+                        await _handFireClient.RetryJob(job.Id);
+                        CommonServices.LoggingService.WriteInformation("Recovered failed job {JobId}", job.Id);
+                    }
+                    catch (Exception ex)
+                    {
+                        CommonServices.LoggingService.WriteError.(ex, "Failed to recover job {JobId}", job.Id);
+                    }
+                }
+            }
+        }
+
+		public static class JobMonitoring
+		{
+			public static async Task<JobHealthStatus> GetJobHealthStatus()
+			{
+				return new JobHealthStatus
+				{
+					FailedJobs = await _handFireClient.GetFailedJobCount(),
+                    ProcessingJobs = await _handFireClient.GetProcessingJobCount(),
+                    ScheduledJobs = await _handFireClient.GetScheduledJobCount(),
+                    RetryingJobs = await _handFireClient.GetRetryingJobCount()
+				}
+			}
+		}
+
+		#endregion
+
+		#region Supporting Classes
+
+		public class RecurringJobOptions
+		{
+			public TimeZoneInfo TimeZone { get; set; }
+			public string QueueName { get; set; }
+			public bool EnableRetries { get; set; } = true;
+		}
+
+		public class JobContinuationOptions
+		{
+			public JobContinuationState[] States { get; set; }
+		}
+
+		public class JobHealthStatus
+		{
+			public long FailedJobs { get; set; }
+			public long ProcessingJobs { get; set; }
+			public long ScheduledJobs { get; set; }
+			public long RetryingJobs { get; set; }
+		}
+
+		public enum JobContinuationState
+		{
+			Succeeded,
+			Failed,
+			Deleted
+		}
+
+		public class JobFailedException : Exception
+		{
+			public IReadOnlyList<Exception> RetryExceptions { get; }
+
+			public JobFailedException(string message, Exception innerException, List<Exception> retryExceptions)
+				: base(message, innerException)
+			{
+				RetryExceptions = retryExceptions;
+			}
+		}
+
+		public class HandFireOperationException : Exception
+		{
+			public HandFireOperationException(string message, Exception innerException)
+				: base(message, innerException)
+			{
+			}
+		}
+
+		#endregion
+
+		#region Extension Methods
+
+		public static class HandFireExtensions
+		{
+			public static string EnqueueHandFire<T>(this T instance, Expression<Action<T>> methodCall)
+			{
+				return HandFireHelper.Enqueue(methodCall);
+			}
+
+			public static string ScheduleHandFire<T>(this T instance, Expression<Action<T>> methodCall, TimeSpan delay)
+			{
+				return HandFireHelper.Schedule(methodCall, delay);
+			}
+		}
+
+		#endregion
+	}
+
+	#endregion
+}
+```
+
+### Example using
+`
+```c#
+	#region Example Implementation
+
+    public interface IMyService
+    {
+        void DoWork();
+        Task DoWorkAsync();
+        void ProcessLater();
+        void DailyCleanup();
+        void AfterWorkCompleted();
+    }
+
+    public class MyService : IMyService
+    {
+        public void DoWork() 
+        {
+            // Implementation
+        }
+
+        public async Task DoWorkAsync()
+        {
+            await Task.Delay(1000);
+        }
+
+        public void ProcessLater() 
+        {
+            // Implementation
+        }
+
+        public void DailyCleanup() 
+        {
+            // Implementation
+        }
+
+        public void AfterWorkCompleted() 
+        {
+            // Implementation
+        }
+    }
+
+    public class HandFireImplementationExample
+    {
+        public static void ConfigureAndUse()
+        {
+            // Configure default retry options
+            HandFireHelper.ConfigureDefaultRetryOptions(options =>
+            {
+                options.MaxRetries = 5;
+                options.InitialRetryInterval = TimeSpan.FromSeconds(10);
+                options.MaxRetryInterval = TimeSpan.FromMinutes(30);
+                options.UseExponentialBackoff = true;
+                options.RetryableExceptions = new[]
+                {
+                    typeof(TimeoutException),
+                    typeof(HttpRequestException),
+                    typeof(DbException)
+                };
+                options.OnRetry = (exception, retryCount, delay) =>
+                {
+                    Console.WriteLine($"Retry {retryCount} scheduled after {delay.TotalSeconds} seconds");
+                };
+            });
+
+            // Fire-and-forget job
+            var fireForgetJobId = HandFireHelper.Enqueue<IMyService>(x => x.DoWork());
+
+            // Delayed job
+            var delayedJobId = HandFireHelper.Schedule<IMyService>(
+                x => x.ProcessLater(),
+                TimeSpan.FromHours(1));
+
+            // Recurring job
+            HandFireHelper.AddOrUpdateRecurring<IMyService>(
+                "daily-cleanup",
+                x => x.DailyCleanup(),
+                "0 0 * * *", // Daily at midnight
+                new RecurringJobOptions 
+                { 
+                    TimeZone = TimeZoneInfo.Utc,
+                    EnableRetries = true
+                });
+
+            // Continuation job
+            var continuationJobId = HandFireHelper.ContinueWith<IMyService>(
+                fireForgetJobId,
+                x => x.AfterWorkCompleted());
+
+            // Using extension method
+            var myService = new MyService();
+            var extensionJobId = myService.EnqueueHandFire(x => x.DoWork());
+        }
+
+        public static async Task MonitorAndRecover()
+        {
+            // Monitor job health
+            var healthStatus = await HandFireHelper.JobMonitoring.GetJobHealthStatus();
+            Console.WriteLine($"Failed Jobs: {healthStatus.FailedJobs}");
+            Console.WriteLine($"Processing Jobs: {healthStatus.ProcessingJobs}");
+            Console.WriteLine($"Scheduled Jobs: {healthStatus.ScheduledJobs}");
+            Console.WriteLine($"Retrying Jobs: {healthStatus.RetryingJobs}");
+
+            // Recover failed jobs
+            await HandFireHelper.JobRecovery.RecoverFailedJobs(
+                failedJobAge: TimeSpan.FromHours(24),
+                batchSize: 50);
+        }
+    }
+
+    #endregion
+```
