@@ -7,13 +7,14 @@ categories:
 tags:
     - note
 ---
-# Nghe cho vui
+# Nghe
 
 ## Tìm kiếm
 
 Hầu hết chúng ta đang tìm kiếm cái gì? Mỗi người chúng
 ta mong muốn cái gì? Đặc biệt trong thế giới hỗn loạn
 này, nơi mọi người đang cố gắng tìm ra một loại an bình nào
+<!-- more -->
 đó, một loại hạnh phúc nào đó, một chỗ ẩn náu, chắc chắn rất
 quan trọng phải tìm ra, chúng ta đang cố gắng tìm kiếm cái
 gì, chúng ta đang cố gắng khám phá cái gì, đúng chứ? Có thể

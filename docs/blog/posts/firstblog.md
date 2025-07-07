@@ -12,4 +12,5 @@ tags:
   <figcaption>From pinterest</figcaption>
 </figure>
 
-Bản chất có tính cú pháp của thực tại, bí mật đích thực của phép màu, là thế giới được tạo ra bởi từ ngữ. Và nếu bạn biết được điều đó, bạn có thể tạo được bất cứ thứ gì bạn muốn. Nếu thế giới được tạo ra bởi ngôn ngữ, thì bạn có thể hack nó như bạn hack một đoạn mã lập trình.
+
+Bản chất có tính cú pháp của thực tại, bí mật đích thực của phép màu, <!-- more --> là thế giới được tạo ra bởi từ ngữ. Và nếu bạn biết được điều đó, bạn có thể tạo được bất cứ thứ gì bạn muốn. Nếu thế giới được tạo ra bởi ngôn ngữ, thì bạn có thể hack nó như bạn hack một đoạn mã lập trình.

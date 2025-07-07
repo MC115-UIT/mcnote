@@ -1,0 +1,53 @@
+/* Make sure to reset the default layout wrappers */
+.md-main__inner{
+  max-width: 80% !important;
+  padding: 0 !important;
+  justify-content: center;
+}
+
+.md-content .bg-cus{
+  justify-content: center;
+  width: 100%;
+  max-width: 100% !important;
+  margin: 0 ;
+  padding: 0;
+}
+
+/* Override hero section */
+.bg-cus {
+  background: url('../assets/images/bg-note.jpg') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
+
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  color: white;
+  text-align: center;
+}
+
+.bg-cus::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 0;
+}
+
+.bg-cus__content {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}

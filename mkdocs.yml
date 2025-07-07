@@ -4,11 +4,9 @@ repo_url: https://github.com/MC115-UIT/mcnote
 repo_name: MC115-UIT/mcnote
 theme:
   name: material
+  custom_dir: docs/overrides
   font:
     text: Lora
-#  font: false
-#  extra_css:
-#    - docs/stylesheets/extra.css
   icon:
     previous: fontawesome/solid/angle-left
     next: fontawesome/solid/angle-right
@@ -59,7 +57,10 @@ plugins:
     - search
     - tags:
         tags_file: tags.md
-    - blog
+    - blog:
+        archive_pagination: true
+        archive_pagination_per_page: 5
+        archive_toc: true
     - mkdocs-pdf
 extra:
   social:
@@ -67,6 +68,8 @@ extra:
       link: https://fb.com/tuilacuongg
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/in/minhcuong11005/
+extra_css:
+  - styles/custom-background.css
 markdown_extensions:
     - pymdownx.highlight:
         anchor_linenums: true
@@ -76,6 +79,7 @@ markdown_extensions:
     - pymdownx.snippets
     - pymdownx.superfences
     - pymdownx.blocks.caption
+    - admonition
     - attr_list
     - md_in_html
 nav:
