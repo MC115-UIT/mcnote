@@ -1,16 +1,42 @@
 {% extends "main.html" %}
 
 {% block content %}
-<section class="bg-cus">
-  <div class="bg-cus__content">
-    <h1>Just a small town boy, born and raised in 66</h1>
-    <p>
-        "Amor fati — love your code, your crashes, your deadlines. Every bug, every rollback, every merge conflict — all of it is part of the craft."
-        — A Stoic Developer
-    </p>
-    <a href="{{ base_url }}/about/about/" class="md-button md-button--primary">About me</a>
-    <a href="{{ base_url }}/about/portfolito/" class="md-button">My CV</a>
+<section class="pf-hero">
+  <div class="pf-hero__content">
+    <h1 class="pf-hero__title">
+       Hi, I'm <span class="pf-gradient-text">Minh Cuong</span>
+    </h1>
+    <h2 class="pf-hero__subtitle">
+       Software Engineer | .NET Developer | Data Enthusiast
+    </h2>
+    
+    <div style="margin-bottom: 3rem;">
+        <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.6; color: #ccc;">
+            "Amor fati — love your code, your crashes, your deadlines. Every bug, every rollback, every merge conflict — all of it is part of the craft."
+        </p>
+    </div>
 
+    <div class="pf-hero__actions">
+        <a href="{{ base_url }}/about/about/" class="pf-btn pf-btn--primary">About Me</a>
+        <a href="{{ base_url }}/about/portfolito/" class="pf-btn">View My CV</a>
+    </div>
   </div>
 </section>
+
+<div class="md-grid" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+    <div class="pf-grid">
+        <a href="{{ base_url }}/blog/" class="pf-card" style="text-decoration: none; color: inherit;">
+            <h3>📝 Latest Thoughts</h3>
+            <p style="color: var(--pf-color-text-muted);">Explore my latest articles on .NET, Data Engineering, and tech life.</p>
+        </a>
+        <a href="{{ base_url }}/coding/NET/helper/" class="pf-card" style="text-decoration: none; color: inherit;">
+            <h3>💻 Code Docs</h3>
+            <p style="color: var(--pf-color-text-muted);">Deep dive into my technical notes, patterns, and research.</p>
+        </a>
+        <a href="mailto:minhcuong11005@gmail.com" class="pf-card" style="text-decoration: none; color: inherit;">
+            <h3>📬 Get in Touch</h3>
+            <p style="color: var(--pf-color-text-muted);">Have a project in mind? Let's collaborate and build something great.</p>
+        </a>
+    </div>
+</div>
 {% endblock %}

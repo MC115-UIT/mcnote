@@ -1,75 +1,40 @@
-# Yah yah !!!
-
-Hi, I’m Minh Cuong – fresh out of UIT and ready to code my way through life! By day, I’m a .NET software engineer, dabbling in the mysteries of data engineering, and by night, you might catch me on a long bus ride, treating it like meditation🧘‍♂️. With over 4 years of study and work experience on the bus, I've mastered the art of turning rush hour commutes into productive hours 😁
-
-On weekends, I swap the screen for library books and occasionally hit the field for a game of football or a run. Coding pays the bills, but it’s all about balance, right?
-
-Fun fact: I can sing... a little. Not winning any Grammys yet, but I’ll keep the karaoke bars entertained. Still waiting on a “Player 2” in life – applications are open 🫵 - by ChatGPT
-
-------------------------------------------------------------------------------------------------------------------------------------------------------
-
-<!-- Custom CSS for MkDocs -->
-<style>
-.md-typeset h1 {
-    color: #2094f3;
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
-.timeline {
-    border-left: 3px solid #2094f3;
-    padding-left: 20px;
-    margin-left: 10px;
-}
-.timeline > div {
-    margin-bottom: 20px;
-    position: relative;
-}
-.timeline > div::before {
-    content: '';
-    position: absolute;
-    left: -26px;
-    top: 5px;
-    width: 10px;
-    height: 10px;
-    background: #2094f3;
-    border-radius: 50%;
-}
-.skill-badge {
-    display: inline-block;
-    padding: 5px 10px;
-    margin: 3px;
-    border-radius: 15px;
-    background: #f0f0f0;
-    font-size: 0.9em;
-}
-.contact-card {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: 10px;
-    margin: 20px 0;
-}
-</style>
-
-# NGUYEN MINH CUONG { .text-center }
-
-<div class="text-center" markdown>
-
-### Software Engineer | Database Developer | .NET Developer
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/minhcuong11005/)
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white)](https://github.com/MC115-UIT)
-[![Email](https://img.shields.io/badge/Email-D14836?style=flat&logo=gmail&logoColor=white)](mailto:minhcuong11005@gmail.com)
-
-</div>
-
+---
+hide:
+  - navigation
 ---
 
-<div class="contact-card" markdown>
-## 👨‍💻 Contact Information
+# <span class="pf-gradient-text">Minh Cuong</span> { .text-center }
 
-| 📱 Phone | 📧 Email | 🏠 Location |
-|:--------:|:--------:|:-----------:|
-| 0982076237 | minhcuong11005@gmail.com | Dong Bac Street, Tan Chanh Hiep, Q.12, TP.HCM |
+<div class="text-center" style="margin-bottom: 2rem;">
+    <h3 style="color: var(--pf-color-text-muted); font-weight: 300;">Software Engineer | .NET & Data Enthusiast</h3>
+    <p style="max-width: 800px; margin: 0 auto; color: var(--pf-color-text-muted); font-size: 0.95rem;">
+        Enthusiastic and results-oriented Information Systems graduate from UIT (completed 1 semester ahead of schedule!). 
+        Eager to leverage hands-on experience in developing microservices, optimizing databases, and using cloud services 
+        to contribute to collaborative development teams.
+    </p>
+    
+    <div style="display: flex; justify-content: center; gap: 10px; margin-top: 1rem;">
+        <a href="https://www.linkedin.com/in/minhcuong11005/" target="_blank">
+            <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
+        </a>
+        <a href="https://github.com/MC115-UIT" target="_blank">
+            <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
+        </a>
+        <a href="mailto:minhcuong11005@gmail.com">
+            <img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email">
+        </a>
+    </div>
+</div>
+
+<div class="pf-card" markdown>
+
+### 👋 About Me / Summary
+
+I am a Bachelor of Information Systems graduate from **VNUHCM-UIT** (2020-2024) with a GPA of **8.3/10**, finishing my degree one semester early.
+
+My passion lies in building scalable applications and data solutions. I have proficiency in **C# / .NET Core**, **ASP.NET Core**, and the **ABP Framework**. I am also experienced in Cloud & Containers (**Docker**, **EKS**, **AWS/Azure**) and Database Management.
+
+> Fun fact: I can sing... a little. Not winning any Grammys yet, but I’ll keep the karaoke bars entertained.
 
 </div>
 
@@ -77,90 +42,142 @@ Fun fact: I can sing... a little. Not winning any Grammys yet, but I’ll keep t
 
 ## 🛠️ Technical Stack
 
-| Category | Technologies |
-|----------|-------------|
-| **Programming** | ![C#](https://img.shields.io/badge/C%23-239120?style=flat&logo=c-sharp&logoColor=white) ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white) ![Java](https://img.shields.io/badge/Java-ED8B00?style=flat&logo=java&logoColor=white) |
-| **Frameworks** | ![.NET](https://img.shields.io/badge/.NET-512BD4?style=flat&logo=dotnet&logoColor=white) ![Angular](https://img.shields.io/badge/Angular-DD0031?style=flat&logo=angular&logoColor=white) |
-| **Database** | ![SQL](https://img.shields.io/badge/SQL-4479A1?style=flat&logo=mysql&logoColor=white) ![SSAS](https://img.shields.io/badge/SSAS-CC2927?style=flat&logo=microsoft-sql-server&logoColor=white) ![SSIS](https://img.shields.io/badge/SSIS-CC2927?style=flat&logo=microsoft-sql-server&logoColor=white) |
-| **Tools** | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) ![GitLab](https://img.shields.io/badge/GitLab-FCA121?style=flat&logo=gitlab&logoColor=white) ![Jira](https://img.shields.io/badge/Jira-0052CC?style=flat&logo=jira&logoColor=white) |
+<div class="pf-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+
+<div class="pf-card" markdown>
+### 💻 Programming & Frameworks
+<div class="pf-skills-grid">
+    <div class="pf-skill-tag">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg" />
+        <span>C# / .NET Core</span>
+    </div>
+    <div class="pf-skill-tag">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dotnetcore/dotnetcore-original.svg" />
+        <span>ASP.NET Core</span>
+    </div>
+    <div class="pf-skill-tag">
+        <span>ABP Framework</span>
+    </div>
+     <div class="pf-skill-tag">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg" />
+        <span>Angular</span>
+    </div>
+</div>
+</div>
+
+<div class="pf-card" markdown>
+### 🗄️ Database & ETL
+<div class="pf-skills-grid">
+    <div class="pf-skill-tag">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/microsoftsqlserver/microsoftsqlserver-plain.svg" />
+        <span>MSSQL</span>
+    </div>
+    <div class="pf-skill-tag">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" />
+        <span>MySQL</span>
+    </div>
+    <div class="pf-skill-tag">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" />
+        <span>Oracle / PL/SQL</span>
+    </div>
+    <div class="pf-skill-tag">
+         <span>SSAS / SSIS</span>
+    </div>
+</div>
+</div>
+
+<div class="pf-card" markdown>
+### ☁️ Cloud & Tools
+<div class="pf-skills-grid">
+    <div class="pf-skill-tag">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" />
+        <span>Docker</span>
+    </div>
+     <div class="pf-skill-tag">
+        <span>EKS (K8s)</span>
+    </div>
+    <div class="pf-skill-tag">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/gitlab/gitlab-original.svg" />
+        <span>GitLab / Bitbucket</span>
+    </div>
+    <div class="pf-skill-tag">
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jira/jira-original.svg" />
+        <span>Jira</span>
+    </div>
+</div>
+</div>
+
+</div>
 
 ---
 
 ## 💼 Professional Journey
-<div class="timeline" markdown>
 
-### Current Position
+<div class="pf-timeline" markdown>
 
-"Software Engineer (.NET Developer) | LizAI Vietnam"
-    *October 2024 - Present*
+<div class="pf-timeline-item" markdown>
+<span class="pf-timeline-date">October 2024 - Present</span>
+<h3 class="pf-timeline-title">Software Engineer (.NET Developer)</h3>
+<div class="pf-timeline-subtitle">LizAI Vietnam</div>
+<div class="pf-timeline-content" markdown>
+- **System Integration**: Integrating with external healthcare provider systems, built-in cloud storage (Azure, AWS, Google), and internal database services.
+- **Microservices & Infrastructure**: Developed scalable APIs, Gateway, and microservices using C#, ASP.NET Core, Docker, RabbitMQ, and gRPC.
+- **IaC & Automation**: Contributed to the **Uplizd-Infrastructure** project by developing the IaC Service to automate the full lifecycle (deployment, scaling, backup) on EKS.
+- **Healthcare Standards**: Researching standards such as **OMOP**, **FHIR**, and modernizing legacy systems.
+</div>
+</div>
 
-    - Developing scalable APIs Gateway and microservices
-    - Modernizing legacy systems
-    - Tech Stack: C#, ASP.NET Core, Docker
+<div class="pf-timeline-item" markdown>
+<span class="pf-timeline-date">June 2024 - August 2024</span>
+<h3 class="pf-timeline-title">Software Development Engineer</h3>
+<div class="pf-timeline-subtitle">Sacombank</div>
+<div class="pf-timeline-content" markdown>
+- **Modernization**: Worked on modernizing legacy applications by adopting microservice-oriented architecture using the **ABP framework** and **Angular**.
+- **Full-Stack Development**: Responsible for designing and implementing database schemas, backend logic, and frontend interfaces.
+- **Support**: Handled ticket resolution and internal application development.
+</div>
+</div>
 
-### Previous Roles
-
-"Software Development Engineer | Sacombank"
-    *June 2024 - August 2024*
-
-    - Full-stack development with .NET 8 & Angular 17
-    - Microservice architecture implementation
-
-"Database Developer Intern | Spiraledge Vietnam"
-    *August 2023 - November 2023*
-
-    - MySQL database management
-    - Optimization of database performance
-    - 50+ tickets resolved
+<div class="pf-timeline-item" markdown>
+<span class="pf-timeline-date">August 2023 - November 2023</span>
+<h3 class="pf-timeline-title">Database Developer Intern</h3>
+<div class="pf-timeline-subtitle">Spiraledge Vietnam</div>
+<div class="pf-timeline-content" markdown>
+- **DBA Role**: Served as Database Administrator for high-traffic platforms (`www.tend.com`, `www.swim.com`), managing MySQL databases.
+- **Optimization**: Developed and optimized complex SQL queries, stored procedures, and functions to enhance performance.
+- **Support**: Resolved over 50 tickets via JIRA, ensuring optimal uptime and functionality.
+</div>
+</div>
 
 </div>
 
 ---
 
-## 📚 Education & Academic Achievement
+## 🎯 University Projects
 
-| Degree | Institution | Duration | Performance |
-|--------|-------------|----------|-------------|
-| **Bachelor of Information System** | University of Information Technology - VNUHCM-UIT | 2020-2024 | GPA: 8.3/10 |
+<div class="pf-grid" markdown>
 
----
+<div class="pf-card" markdown>
+### Fresh Food Website
+ASP.NET Core backend with a user-friendly interface. E-commerce platform implementation.
+</div>
 
-## 🎯 School Projects
+<div class="pf-card" markdown>
+### Deep Graph Clustering
+**Research**: Paper on clustering algorithms with dual correlation reduction (Python).
+</div>
 
-| Project | Description | Technologies |
-|---------|-------------|--------------|
-| **Fresh Food Website** | E-commerce platform with intuitive UI | ASP.NET Core |
-| **Deep Graph Clustering** | Research on clustering algorithms | Python, ML |
-| **WorldCup ETL Pipeline** | Data integration & analysis system | SSAS, SSIS |
-
----
-
-## 🌐 Language Proficiency
-
-| Language | Level | Certification |
-|----------|-------|---------------|
-| English | Intermediate | TOEIC LR: 765 <br> TOEIC SW: 260 |
-| Vietnamese | Proficient | Native Speaker |
-
----
-
-## 🎨 Personal Interests
-
-| ⚽ Sports | 🎵 Arts | 📚 Learning |
-|-----------|---------|-------------|
-| Football playing & watching | Music exploration | Reading various genres |
-
----
-
-<div class="text-center" markdown>
-
-*"Passionate about building scalable solutions and continuous learning"*
-
-[Contact Me](mailto:minhcuong11005@gmail.com){ .md-button .md-button--primary }
+<div class="pf-card" markdown>
+### WorldCup ETL Pipeline
+**Data Engineering**: Built with **SSAS** and **SSIS** for data integration and analysis.
+</div>
 
 </div>
 
-<!-- <figure markdown="span">
-![Terence Mckenna](image/fakemc1.jpg){ width="300",height="600", align=right }
-<figcaption>Fake Me generated by somehow AI :))</figcaption>
-</figure> -->
+---
+
+<div class="text-center" style="margin-top: 4rem; margin-bottom: 2rem;" markdown>
+## Ready to collaborate?
+
+[Contact Me](mailto:minhcuong11005@gmail.com){ .pf-btn .pf-btn--primary }
+</div>

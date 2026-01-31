@@ -70,6 +70,7 @@ extra:
       link: https://www.linkedin.com/in/minhcuong11005/
 extra_css:
   - styles/custom-background.css
+  - styles/portfolio.css
 markdown_extensions:
     - pymdownx.highlight:
         anchor_linenums: true
@@ -84,9 +85,9 @@ markdown_extensions:
     - md_in_html
 nav:
   - Home: index.md
-  - About:
+  - Portfolio:
     - About me: about/about.md
-    - Portfolito: about/portfolito.md
+    - My CV: about/portfolito.md
   - Code Docs:
     - .NET: 
       - Research :
